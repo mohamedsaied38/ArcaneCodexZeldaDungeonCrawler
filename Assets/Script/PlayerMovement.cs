@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 _inputMovement;
     private Vector3 _direction;
     private Vector3 _lookDirection;
+    private CharacterController _characterController;
 
     [SerializeField] private float _speed = 5f;
     [SerializeField] Transform _model;
@@ -16,19 +17,31 @@ public class PlayerMovement : MonoBehaviour
         _input.Player.Enable();
     }
 
+    private void Start()
+    {
+        _characterController = GetComponent<CharacterController>();
+    }
+
     private void Update()
     {
         _inputMovement = _input.Player.Move.ReadValue<Vector2>();
         _direction.x = _inputMovement.x;
         _direction.z = _inputMovement.y;
 
-        transform.Translate(_direction * (_speed * Time.deltaTime), Space.World);
+        //transform.Translate(_direction * (_speed * Time.deltaTime), Space.World);
+        _characterController.Move(_direction * (_speed * Time.deltaTime));
 
         _lookDirection = transform.position + _direction.normalized;
         _model.LookAt(_lookDirection);
     }
 
-
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.transform.TryGetComponent<ICollidable>(out ICollidable collidable))
+        {
+            collidable.OnCollide(this.transform);
+        }
+    }
 
 
     private void OnDisable()
