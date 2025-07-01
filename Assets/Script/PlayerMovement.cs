@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private float _speed = 5f;
     [SerializeField] Transform _model;
+    [SerializeField] float _gravity = -9.81f;
 
     private void OnEnable()
     {
@@ -28,10 +29,18 @@ public class PlayerMovement : MonoBehaviour
         _direction.x = _inputMovement.x;
         _direction.z = _inputMovement.y;
 
+        if (!_characterController.isGrounded)
+            _direction.y += _gravity * Time.deltaTime;
+        else
+            _direction.y = 0;
+
         //transform.Translate(_direction * (_speed * Time.deltaTime), Space.World);
         _characterController.Move(_direction * (_speed * Time.deltaTime));
 
-        _lookDirection = transform.position + _direction.normalized;
+        _lookDirection = _direction;
+        _lookDirection.y = 0;
+        _lookDirection.Normalize();
+        _lookDirection += transform.position;
         _model.LookAt(_lookDirection);
     }
 
