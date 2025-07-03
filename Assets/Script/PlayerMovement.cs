@@ -52,9 +52,13 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
     private void OnDisable()
     {
         _input.Player.Disable();
+    }
+
+    private void OnDrawGizmos()
+    {
+        Debug.DrawRay(transform.position, _model.forward);
     }
 }
