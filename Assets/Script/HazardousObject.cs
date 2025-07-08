@@ -9,6 +9,15 @@ public class HazardousObject : MonoBehaviour, ICollidable
     {
         Debug.Log($"Hit by {other.name}");
         _hazardEffectEvent?.Invoke();
+    }
 
+    public void DamagePlayer(int amount)
+    {
+        GameObject.FindFirstObjectByType<PlayerInformation>().CauseDamge(amount);
+    }
+
+    public void HealPlayer(int amount) 
+    {
+        GameObject.FindFirstObjectByType<PlayerInformation>().HealDamage(amount);
     }
 }
