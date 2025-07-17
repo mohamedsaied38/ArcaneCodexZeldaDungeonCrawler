@@ -1,18 +1,24 @@
 using UnityEngine;
 
 [System.Serializable]
-public class Room : MonoBehaviour
+public class Room
 {
-    private string _name;
+    public string name;
     private bool[] _exitsOpen = new bool[] { false, false, false, false };
     private bool _visited = false;
 
     public bool Visited => _visited;
-    public string Name => _name;
+    public string Name => name;
+    public bool[] Exits => _exitsOpen;
 
     public Room(string name)
     {
-        _name = name;
+        this.name = name;
     }
 
+    public void VisitRoom(DungeonDirections direction)
+    {
+        _visited = true;
+        _exitsOpen[(int)direction] = true;
+    }
 }

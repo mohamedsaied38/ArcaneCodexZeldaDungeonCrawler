@@ -7,6 +7,8 @@ public class RoomController : MonoBehaviour
     [SerializeField] private Renderer[] _renderers;
 
     [SerializeField] private Transform[] _environmentObjects;
+    [SerializeField, Tooltip("Exits should be in order of N,E,S,W.")] private ExitController[] _exits;
+    private Room _roomInfo;
 
     private void OnEnable()
     {
@@ -52,6 +54,15 @@ public class RoomController : MonoBehaviour
             if (rng >= 0.75f)
                 t.gameObject.SetActive(true);
             else t.gameObject.SetActive(false);
+        }
+    }
+
+    public void SetRoom(Room room)
+    {
+        _roomInfo = room;
+        for (int i = 0;  i < _roomInfo.Exits.Length; i++)
+        {
+            _exits[i].SetExit(_roomInfo.Exits[i]);
         }
     }
 }

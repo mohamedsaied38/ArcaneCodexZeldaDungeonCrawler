@@ -2,15 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum DungeonDirections
-{
-    North,
-    East,
-    South,
-    West
-}
-
-
 public class DungeonGenerator : MonoBehaviour
 {
     private Room[,] _roomGrid;
@@ -20,9 +11,17 @@ public class DungeonGenerator : MonoBehaviour
     [SerializeField] private List<Room> _rooms = new List<Room>();
 
     private Vector2Int _currentRoom;
-    private Vector2Int _targetRoom;    
+    private Vector2Int _targetRoom;
+    [SerializeField]
     private List<Room> _visitedRooms = new List<Room>();
     private List<Vector2Int> _path = new List<Vector2Int>();
+
+    private Vector2Int _falseRoom = new Vector2Int(-1, -1); //Subsitutes for null checks
+
+    [SerializeField] private GameObject _roomObject;
+    [SerializeField] private int _roomSize = 1;
+
+    [SerializeField] private GameObject _player;
 
     private void Start()
     {
@@ -63,6 +62,9 @@ public class DungeonGenerator : MonoBehaviour
         _currentRoom = new Vector2Int(rndX,rndY);
         _visitedRooms.Clear();
         _visitedRooms.Add(_roomGrid[_currentRoom.x, _currentRoom.y]);
+        //_visitedRooms[0].VisitRoom();
+        _path.Clear();
+        _path.Add(_currentRoom);    
 
         Debug.Log($"Starting Room is {_roomGrid[_currentRoom.x, _currentRoom.y].Name}.");
 
@@ -74,10 +76,20 @@ public class DungeonGenerator : MonoBehaviour
         while (_visitedRooms.Count < _gridSize)
         {
             _targetRoom = ValidRandomDirection(_currentRoom);
+            if (_targetRoom != _falseRoom)
+            {
+                _roomGrid[_currentRoom.x, _currentRoom.y].VisitRoom(GetDirection(_currentRoom, _targetRoom));
+                _roomGrid[_targetRoom.x, _targetRoom.y].VisitRoom(GetDirection(_targetRoom, _currentRoom));
+                _path.Add(_targetRoom);
+                _currentRoom = _targetRoom;
+                _visitedRooms.Add(_roomGrid[_currentRoom.x, _currentRoom.y]);
+            }
+            else break;
+
             yield return null;
         }
+        BuildDungeon(_path);
     }
-
 
     private Vector2Int ValidRandomDirection(Vector2Int currentPOS)
     {
@@ -104,14 +116,67 @@ public class DungeonGenerator : MonoBehaviour
                     }
                     break;
                 case DungeonDirections.South:
+                    if (CheckingDirection.y - 1 >= 0 &&
+                        !_roomGrid[CheckingDirection.x, CheckingDirection.y - 1].Visited)
+                    {
+                        CheckingDirection.y -= 1;
+                        directions.Add(CheckingDirection);
+                    }
                     break;
                 case DungeonDirections.West:
+                    if (CheckingDirection.x - 1 >= 0 && 
+                        !_roomGrid[CheckingDirection.x - 1, CheckingDirection.y].Visited)
+                    {
+                        CheckingDirection.x -= 1;
+                        directions.Add(CheckingDirection);
+                    }
                     break;
                 default:
                     break;
             }
         }
-        return directions[Random.Range(0, directions.Count)];
+
+
+        return directions.Count > 0 ? directions[Random.Range(0, directions.Count)] : _falseRoom;
     }
 
+    private void BuildDungeon(List<Vector2Int> grid)
+    {
+        Vector3 pos = Vector3.zero;
+        foreach (Vector2Int room in grid)
+        {
+            pos.x = room.x * _roomSize;
+            pos.z = room.y * _roomSize;
+            RoomController rc = Instantiate(_roomObject, pos, Quaternion.identity).GetComponent<RoomController>();
+            rc.SetRoom(_roomGrid[room.x, room.y]);
+        }
+
+        if (_player != null)
+        {
+            pos.x = grid[0].x * _roomSize;
+            pos.z = grid[0].y * _roomSize;
+            pos.y = 1.05f;
+
+            _player.GetComponent<CharacterController>().enabled = false;
+            _player.transform.position = pos;
+            _player.GetComponent<CharacterController>().enabled = true;
+        }
+    }
+
+    private DungeonDirections GetDirection(Vector2Int current, Vector2Int target)
+    {
+        var diff = target - current;
+
+        return diff.x switch
+        {
+            1 => DungeonDirections.East,
+            -1 => DungeonDirections.West,
+            _ => diff.y switch
+            {
+                1 => DungeonDirections.North,
+                -1 => DungeonDirections.South,
+                _ => DungeonDirections.North
+            }
+        };
+    }
 }
