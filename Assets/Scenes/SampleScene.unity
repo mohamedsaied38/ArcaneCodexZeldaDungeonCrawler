@@ -718,6 +718,8 @@ MonoBehaviour:
   _roomObject: {fileID: 8475599420347948617, guid: 9df61dc275545b84eb2521f94916127d, type: 3}
   _roomSize: 9
   _player: {fileID: 1586531409}
+  _openWallChance: 0.1
+  _voidRoomChance: 0.01
 --- !u!4 &1537667353
 Transform:
   m_ObjectHideFlags: 0

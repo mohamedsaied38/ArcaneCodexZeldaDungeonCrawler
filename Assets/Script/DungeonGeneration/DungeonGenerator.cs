@@ -1,6 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
+using Random = UnityEngine.Random;
+using Debug = UnityEngine.Debug;
 
 public class DungeonGenerator : MonoBehaviour
 {
@@ -23,6 +27,11 @@ public class DungeonGenerator : MonoBehaviour
 
     [SerializeField] private GameObject _player;
 
+    Stopwatch _stopWatch;
+
+    [SerializeField] private float _openWallChance = .1f;
+    [SerializeField] private float _voidRoomChance = .1f;
+
     private void Start()
     {
         _roomGrid = new Room[_gridXSize, _gridYSize];
@@ -32,13 +41,21 @@ public class DungeonGenerator : MonoBehaviour
         {
             for (int col = 0; col < _gridYSize;col++)
             {
-                _roomGrid[row,col] = new Room($"{row}-{col}");
+                _roomGrid[row,col] = new Room($"{row}-{col}", row, col);
+               /* if (Random.value <= _voidRoomChance)
+                {
+                    _roomGrid[row, col].CreateVoid();
+                    _visitedRooms.Add(_roomGrid[row, col]);
+                }*/
+
                 _rooms.Add(_roomGrid[row,col]); //Just so we can look at in the inspector
             }
         }
 
-        foreach (Room r in _rooms)
-            Debug.Log($"Room: {r.Name}");
+        /*foreach (Room r in _rooms)
+            Debug.Log($"Room: {r.Name}");*/
+        _stopWatch = new Stopwatch();
+        GenerateDungeon();
     }
 
     //Pick start Position
@@ -73,7 +90,8 @@ public class DungeonGenerator : MonoBehaviour
 
     IEnumerator DungeonRoutine()
     {
-        while (_visitedRooms.Count < _gridSize)
+        _stopWatch.Start();
+        while (_visitedRooms.Count < _gridSize && _path.Count > 0)
         {
             _targetRoom = ValidRandomDirection(_currentRoom);
             if (_targetRoom != _falseRoom)
@@ -84,18 +102,77 @@ public class DungeonGenerator : MonoBehaviour
                 _currentRoom = _targetRoom;
                 _visitedRooms.Add(_roomGrid[_currentRoom.x, _currentRoom.y]);
             }
-            else break;
-
-            yield return null;
+            else
+            {
+                _path.Remove(_currentRoom);
+                _currentRoom = _path[_path.Count - 1];
+            }
         }
-        BuildDungeon(_path);
+
+        RandomOpenPaths();
+
+        BuildDungeon(_visitedRooms);
+
+        //Time to Build Metrics
+        _stopWatch.Stop();
+
+        yield return null;
+        // Get the elapsed time as a TimeSpan value.
+        TimeSpan ts = _stopWatch.Elapsed;
+
+        // Format and display the TimeSpan value.
+        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours, ts.Minutes, ts.Seconds,
+            ts.Milliseconds / 10);
+        Debug.Log($"Build Time: {elapsedTime}");
+    }
+
+    private void RandomOpenPaths()
+    {
+        foreach (Room room in _rooms)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                switch ((DungeonDirections)i)
+                {
+                    case DungeonDirections.North:
+                        if (room.Y < _gridYSize - 1 && Random.value <= _openWallChance)
+                        {
+                            room.OpenExit((DungeonDirections)i);
+                            _roomGrid[room.X, room.Y + 1].OpenExit(GetDirection(_roomGrid[room.X, room.Y + 1].GetGridPosition(), room.GetGridPosition()));
+                        }
+                        break;
+                    case DungeonDirections.East:
+                        if (room.X < _gridXSize - 1 && Random.value <= _openWallChance)
+                        {
+                            room.OpenExit((DungeonDirections)i);
+                            _roomGrid[room.X + 1, room.Y].OpenExit(GetDirection(_roomGrid[room.X + 1, room.Y].GetGridPosition(), room.GetGridPosition()));
+                        }
+                        break;
+                    case DungeonDirections.South:
+                        if (room.Y > 0 && Random.value <= _openWallChance)
+                        {
+                            room.OpenExit((DungeonDirections)i);
+                            _roomGrid[room.X, room.Y - 1].OpenExit(GetDirection(_roomGrid[room.X, room.Y - 1].GetGridPosition(), room.GetGridPosition()));
+                        }
+                        break;
+                    case DungeonDirections.West:
+                        if (room.X > 0 && Random.value <= _openWallChance)
+                        {
+                            room.OpenExit((DungeonDirections)i);
+                            _roomGrid[room.X - 1, room.Y].OpenExit(GetDirection(_roomGrid[room.X - 1, room.Y].GetGridPosition(), room.GetGridPosition()));
+                        }
+                        break;
+                }
+            }
+        }
     }
 
     private Vector2Int ValidRandomDirection(Vector2Int currentPOS)
     {
         List<Vector2Int> directions = new List<Vector2Int>();
         Vector2Int CheckingDirection = currentPOS;
-        for (int i = 0; i < 4;i++)
+        for (int i = 0; i < 4; i++)
         {
             CheckingDirection = currentPOS;
             switch ((DungeonDirections)i)
@@ -105,11 +182,11 @@ public class DungeonGenerator : MonoBehaviour
                         !_roomGrid[CheckingDirection.x, CheckingDirection.y + 1].Visited)
                     {
                         CheckingDirection.y += 1;
-                        directions.Add(CheckingDirection);                        
+                        directions.Add(CheckingDirection);
                     }
                     break;
                 case DungeonDirections.East:
-                    if (CheckingDirection.x + 1 < _gridXSize && !_roomGrid[CheckingDirection.x + 1, CheckingDirection.y].Visited)
+                    if (CheckingDirection.x + 1 < _gridXSize && !_roomGrid[CheckingDirection.x + 1, CheckingDirection.y].Visited )
                     {
                         CheckingDirection.x += 1;
                         directions.Add(CheckingDirection);
@@ -124,7 +201,7 @@ public class DungeonGenerator : MonoBehaviour
                     }
                     break;
                 case DungeonDirections.West:
-                    if (CheckingDirection.x - 1 >= 0 && 
+                    if (CheckingDirection.x - 1 >= 0 &&
                         !_roomGrid[CheckingDirection.x - 1, CheckingDirection.y].Visited)
                     {
                         CheckingDirection.x -= 1;
@@ -140,21 +217,22 @@ public class DungeonGenerator : MonoBehaviour
         return directions.Count > 0 ? directions[Random.Range(0, directions.Count)] : _falseRoom;
     }
 
-    private void BuildDungeon(List<Vector2Int> grid)
+    private void BuildDungeon(List<Room> grid)
     {
         Vector3 pos = Vector3.zero;
-        foreach (Vector2Int room in grid)
+        foreach (Room room in grid)
         {
-            pos.x = room.x * _roomSize;
-            pos.z = room.y * _roomSize;
+
+            pos.x = room.X * _roomSize;
+            pos.z = room.Y * _roomSize;
             RoomController rc = Instantiate(_roomObject, pos, Quaternion.identity).GetComponent<RoomController>();
-            rc.SetRoom(_roomGrid[room.x, room.y]);
+            rc.SetRoom(_roomGrid[room.X, room.Y]);
         }
 
         if (_player != null)
         {
-            pos.x = grid[0].x * _roomSize;
-            pos.z = grid[0].y * _roomSize;
+            pos.x = grid[0].X * _roomSize;
+            pos.z = grid[0].Y * _roomSize;
             pos.y = 1.05f;
 
             _player.GetComponent<CharacterController>().enabled = false;

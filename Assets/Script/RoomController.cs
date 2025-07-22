@@ -15,7 +15,7 @@ public class RoomController : MonoBehaviour
         if (_roomCamera == null)
             Debug.LogWarning($"{transform.name}'s Camera is Null", this.gameObject);
         _renderers = GetComponentsInChildren<Renderer>(true);
-        RenderRoom(false);
+        //RenderRoom(false);
         RandomizeEnvironment();
     }
 
