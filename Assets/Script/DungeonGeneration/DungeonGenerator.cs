@@ -219,6 +219,7 @@ public class DungeonGenerator : MonoBehaviour
 
     private void BuildDungeon(List<Room> grid)
     {
+        List<RoomController> roomControllers = new List<RoomController>();
         Vector3 pos = Vector3.zero;
         foreach (Room room in grid)
         {
@@ -227,7 +228,16 @@ public class DungeonGenerator : MonoBehaviour
             pos.z = room.Y * _roomSize;
             RoomController rc = Instantiate(_roomObject, pos, Quaternion.identity).GetComponent<RoomController>();
             rc.SetRoom(_roomGrid[room.X, room.Y]);
+            roomControllers.Add(rc);
         }
+
+        if (roomControllers.Count > 0)
+        {
+            roomControllers[0].BuildNavMesh();
+            foreach (RoomController rc in roomControllers)
+                rc.RandomizeEnvironment();
+        }
+
 
         if (_player != null)
         {
