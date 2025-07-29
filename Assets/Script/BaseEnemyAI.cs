@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,6 +8,9 @@ public class BaseEnemyAI : MonoBehaviour
     Transform[] _targets;
     int _targetID = 0;
     GameObject _player;
+
+    [SerializeField] float _attackTime = 2f;
+    bool _isAttacking = false;
 
     private void Start()
     {
@@ -21,22 +25,36 @@ public class BaseEnemyAI : MonoBehaviour
 
     private void Update()
     {
+        if (_player != null && _agent.remainingDistance <= .1f && !_isAttacking)
+        {
+            StartCoroutine(AttackPlayer());
+            Debug.Log("Player Reached");
+        }
+        
         if (_player != null && _agent.destination != _player.transform.position)
         {
             _agent.destination = _player.transform.position;
         }
-        else if (_player == null && _agent.remainingDistance <= .01f)
+        
+        if (_player == null && _agent.remainingDistance <= .01f)
         {
             _targetID++;
             if (_targetID == _targets.Length) _targetID = 0;
 
             _agent.destination = _targets[_targetID].position;
-        }
-        else if (_player != null && _agent.remainingDistance <= .01f)
-        {
-            //Attack Player
-            Debug.Log("Player Reached");
-        }
+        }    
+        
+    }
 
+    public void SetPlayerTarget(GameObject target)
+    {
+        _player = target;
+    }
+
+    IEnumerator AttackPlayer()
+    {
+        _isAttacking = true;
+        yield return new WaitForSeconds(_attackTime);
+        _isAttacking = false;
     }
 }

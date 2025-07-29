@@ -2,6 +2,7 @@ using UnityEngine;
 using Cinemachine;
 using Unity.AI.Navigation;
 using System.Collections.Generic;
+using System.Collections;
 
 public class RoomController : MonoBehaviour
 {
@@ -54,7 +55,12 @@ public class RoomController : MonoBehaviour
     {
         float rng = 0;
 
-        _renderers.Add(Instantiate(_enemyPrefab, transform.position, Quaternion.identity, transform).GetComponent<Renderer>()); 
+        //Spawn Enemies in the Room
+
+        Transform[] points = transform.Find("Patrol Route").GetComponentsInChildren<Transform>();
+
+        Transform spawnPoint = points[Random.Range(0, points.Length)];
+        _renderers.Add(Instantiate(_enemyPrefab, spawnPoint.position, Quaternion.identity, transform).GetComponent<Renderer>()); 
 
         foreach(Transform t in _environmentObjects)
         {
@@ -75,9 +81,9 @@ public class RoomController : MonoBehaviour
         }
     }
 
-    public void BuildNavMesh()
+    public IEnumerator BuildNavMesh()
     {
+        yield return new WaitForEndOfFrame();
         _navMeshSurface.BuildNavMesh();
-        
     }
 }

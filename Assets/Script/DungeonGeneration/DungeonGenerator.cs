@@ -31,7 +31,7 @@ public class DungeonGenerator : MonoBehaviour
 
     [SerializeField] private float _openWallChance = .1f;
     [SerializeField] private float _voidRoomChance = .1f;
-
+    List<RoomController> _roomControllers;
     private void Start()
     {
         _roomGrid = new Room[_gridXSize, _gridYSize];
@@ -111,7 +111,7 @@ public class DungeonGenerator : MonoBehaviour
 
         RandomOpenPaths();
 
-        BuildDungeon(_visitedRooms);
+        StartCoroutine(BuildDungeon(_visitedRooms));
 
         //Time to Build Metrics
         _stopWatch.Stop();
@@ -217,9 +217,10 @@ public class DungeonGenerator : MonoBehaviour
         return directions.Count > 0 ? directions[Random.Range(0, directions.Count)] : _falseRoom;
     }
 
-    private void BuildDungeon(List<Room> grid)
+    IEnumerator BuildDungeon(List<Room> grid)
     {
-        List<RoomController> roomControllers = new List<RoomController>();
+        yield return null;
+        _roomControllers = new List<RoomController>();
         Vector3 pos = Vector3.zero;
         foreach (Room room in grid)
         {
@@ -228,13 +229,14 @@ public class DungeonGenerator : MonoBehaviour
             pos.z = room.Y * _roomSize;
             RoomController rc = Instantiate(_roomObject, pos, Quaternion.identity).GetComponent<RoomController>();
             rc.SetRoom(_roomGrid[room.X, room.Y]);
-            roomControllers.Add(rc);
+            _roomControllers.Add(rc);
         }
 
-        if (roomControllers.Count > 0)
+        if (_roomControllers.Count > 0)
         {
-            roomControllers[0].BuildNavMesh();
-            foreach (RoomController rc in roomControllers)
+            yield return StartCoroutine(_roomControllers[0].BuildNavMesh());
+
+            foreach (RoomController rc in _roomControllers)
                 rc.RandomizeEnvironment();
         }
 
