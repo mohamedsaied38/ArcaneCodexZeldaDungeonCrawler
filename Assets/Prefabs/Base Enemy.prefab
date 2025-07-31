@@ -80,6 +80,7 @@ GameObject:
   - component: {fileID: 1640446661256744135}
   - component: {fileID: 5776619476198043793}
   - component: {fileID: 9213740695148931664}
+  - component: {fileID: 4753092903056279698}
   m_Layer: 0
   m_Name: Base Enemy
   m_TagString: Untagged
@@ -191,7 +192,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -211,3 +212,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f04e37306b03f44e970b6d9357665ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _attackTime: 2
+  _attackDistance: 1
+  _attackDamage: 5
+--- !u!114 &4753092903056279698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7177443985762330721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71e5157f474ecc14992c825baec23815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _hazardEffectEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4753092903056279698}
+        m_TargetAssemblyTypeName: HazardousObject, Assembly-CSharp
+        m_MethodName: DirectPlayer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

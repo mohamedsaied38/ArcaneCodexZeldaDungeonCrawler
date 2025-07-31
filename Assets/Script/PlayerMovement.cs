@@ -120,4 +120,14 @@ public class PlayerMovement : MonoBehaviour
     {
         Debug.DrawRay(transform.position, _model.forward);
     }
+
+    public void AdjustDirection(Vector3 direction)
+    {
+        Debug.Log("AdjustDirection");
+        _direction = direction;
+
+        _isKickedBack = true;
+        if (_kickbackRoutine == null)
+            _kickbackRoutine = StartCoroutine(KickBackRoutine());
+    }
 }

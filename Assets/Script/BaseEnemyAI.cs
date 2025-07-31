@@ -8,9 +8,13 @@ public class BaseEnemyAI : MonoBehaviour
     Transform[] _targets;
     int _targetID = 0;
     GameObject _player;
+    PlayerInformation _playerInfo;
 
     [SerializeField] float _attackTime = 2f;
     bool _isAttacking = false;
+    [SerializeField] float _attackDistance = 1f;
+
+    [SerializeField] int _attackDamage = 5;
 
     private void Start()
     {
@@ -25,10 +29,12 @@ public class BaseEnemyAI : MonoBehaviour
 
     private void Update()
     {
-        if (_player != null && _agent.remainingDistance <= .1f && !_isAttacking)
+        if (_player != null && _agent.remainingDistance <= _attackDistance && !_isAttacking)
         {
             StartCoroutine(AttackPlayer());
             Debug.Log("Player Reached");
+            _playerInfo.CauseDamge(_attackDamage);
+            DirectPlayer();
         }
         
         if (_player != null && _agent.destination != _player.transform.position)
@@ -36,7 +42,7 @@ public class BaseEnemyAI : MonoBehaviour
             _agent.destination = _player.transform.position;
         }
         
-        if (_player == null && _agent.remainingDistance <= .01f)
+        if (_player == null && _agent.remainingDistance <= _attackDistance)
         {
             _targetID++;
             if (_targetID == _targets.Length) _targetID = 0;
@@ -46,9 +52,18 @@ public class BaseEnemyAI : MonoBehaviour
         
     }
 
+    public void DirectPlayer()
+    {
+        Vector3 direction = transform.position - _player.transform.position;
+        //direction.Normalize();
+        _player.GetComponent<PlayerMovement>().AdjustDirection(direction);
+    }
+
     public void SetPlayerTarget(GameObject target)
     {
         _player = target;
+        if (_player != null) 
+            _playerInfo = _player.GetComponent<PlayerInformation>();
     }
 
     IEnumerator AttackPlayer()

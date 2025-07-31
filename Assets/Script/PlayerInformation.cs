@@ -8,10 +8,17 @@ public class PlayerInformation : MonoBehaviour
     [SerializeField] private int _defensePoints;
     [SerializeField] private float _speed = 5f;
 
+    Animator _animator;
+
     public int MaxHealth => _maxHealth;
     public int CurrentHealth => _currentHealth;
-    public float Speed => _speed;  
-        
+    public float Speed => _speed;
+
+    private void Start()
+    {
+        _animator = GetComponent<Animator>();
+    }
+
     public void CauseDamge(int damageAmount)
     {
         if (_defensePoints > 0 && damageAmount > 0)
@@ -24,6 +31,8 @@ public class PlayerInformation : MonoBehaviour
         _currentHealth -= damageAmount;
         if (_currentHealth < 0) 
             _currentHealth = 0;
+
+        _animator.SetTrigger("Damage");
     }
 
     public void HealDamage(int healAmount)
