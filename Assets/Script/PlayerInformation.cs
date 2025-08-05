@@ -7,12 +7,15 @@ public class PlayerInformation : MonoBehaviour
     [SerializeField] private int _currentHealth;
     [SerializeField] private int _defensePoints;
     [SerializeField] private float _speed = 5f;
+    [SerializeField] private int _attackDamage = 10;
 
     Animator _animator;
 
     public int MaxHealth => _maxHealth;
     public int CurrentHealth => _currentHealth;
     public float Speed => _speed;
+    public int AttackDamage => _attackDamage;
+
 
     private void Start()
     {

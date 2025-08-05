@@ -86,4 +86,10 @@ public class RoomController : MonoBehaviour
         yield return new WaitForEndOfFrame();
         _navMeshSurface.BuildNavMesh();
     }
+
+    public void RemoveRenderer(Renderer renderer)
+    {
+        if (_renderers.Contains(renderer))
+            _renderers.Remove(renderer);
+    }
 }

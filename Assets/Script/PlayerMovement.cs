@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool _canBeHit = true;
     private bool _isKickedBack = false;
+    private bool _canAttack = true;
 
     [SerializeField] private float _shortWaitLength = .25f;
     //[SerializeField] private float _mediumWaitLength = 1.0f;
@@ -28,17 +30,20 @@ public class PlayerMovement : MonoBehaviour
     private Coroutine _invisibiltyRoutine;
     private Coroutine _kickbackRoutine;
 
+    Animator _animator;
 
     private void OnEnable()
     {
         _input = new InputSystem_Actions();
         _input.Player.Enable();
+        _input.Player.Attack.performed += PlayerAttack;
     }
 
     private void Start()
     {
         _characterController = GetComponent<CharacterController>();
         _playerInformation = GetComponent<PlayerInformation>();
+        _animator = GetComponent<Animator>();
 
         _shortWait = new WaitForSeconds(_shortWaitLength);
         _longWait = new WaitForSeconds(_longWaitlength);
@@ -78,6 +83,22 @@ public class PlayerMovement : MonoBehaviour
             //transform.Translate(_direction * (_speed * Time.deltaTime), Space.World);
             _characterController.Move(_direction * (_speed * Time.deltaTime * -.5f));
         }
+    }
+
+    private void PlayerAttack(InputAction.CallbackContext context)
+    {
+        if (_canAttack)
+        {
+            _animator.SetTrigger("Attack");
+            _canAttack = false;
+            StartCoroutine(AttackCooldown());
+        }
+    }
+
+    IEnumerator AttackCooldown()
+    {
+        yield return new WaitForSeconds(.9f);
+        _canAttack = true;
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
