@@ -2,6 +2,25 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+[System.Serializable]
+public class ItemKeyPair
+{
+    public int key;
+    public Item value;
+
+    public ItemKeyPair(int key, Item value)
+    {
+        this.key = key;
+        this.value = value;
+    }
+}
+
+[System.Serializable]
+public class ItemDictionaryWrapper
+{
+    public List<ItemKeyPair> items = new List<ItemKeyPair>();
+}
+
 public class InventoryManager : MonoBehaviour
 {
     //Master Item List ( ID, Item Class)
@@ -81,6 +100,16 @@ public class InventoryManager : MonoBehaviour
         return false;
     }
 
+    public bool AddItemToMasterList(Item item, bool saveAfter = true)
+    {
+        bool added = AddToMasterList(item);
+        if (added && saveAfter)
+        {
+            WriteOutToJson();
+        }
+        return added;
+    }
+
     [ContextMenu("Add Test Item")]
     private void AddTestItem()
     {
@@ -96,14 +125,19 @@ public class InventoryManager : MonoBehaviour
         if (File.Exists(filePath))
         {
             string masterList = File.ReadAllText(filePath);
-            _masterItemList = JsonUtility.FromJson<Dictionary<int, Item>>(masterList);
+            var list = JsonUtility.FromJson<ItemDictionaryWrapper>(masterList);
+            _masterItemList = ItemDictionaryConverter.ToDictionary(list);
         }
     }
 
     [ContextMenu("Save Master List")]
     public void WriteOutToJson()
     {
-        string masterList = JsonUtility.ToJson(_masterItemList);
+        Debug.Log(_masterItemList.Count);
+
+        var list = ItemDictionaryConverter.ToWrapper(_masterItemList);
+
+        string masterList = JsonUtility.ToJson(list, true);
 
         Debug.Log(masterList);
 
