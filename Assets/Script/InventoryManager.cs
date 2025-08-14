@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
@@ -27,6 +28,8 @@ public class InventoryManager : MonoBehaviour
     private Dictionary<int, Item> _masterItemList = new Dictionary<int, Item>();
     //Player Inventory ( ID, Count)
     private Dictionary<int, int> _playerInventory = new Dictionary<int, int>();
+
+    public Dictionary<int, Item> MasterItemList => _masterItemList;
 
     public void AddToInventory(int id, int count)
     {
@@ -79,7 +82,7 @@ public class InventoryManager : MonoBehaviour
     }
 
     [ContextMenu("Next Key ID")]
-    private int GetNextKeyID()
+    public int GetNextKeyID()
     {
         Debug.Log($"Next Key Value = {_masterItemList.Count}");
         return _masterItemList.Count;
@@ -87,15 +90,10 @@ public class InventoryManager : MonoBehaviour
 
     private bool AddToMasterList(Item item)
     {
-        if (!_masterItemList.ContainsValue(item))
+        if (_masterItemList.All( i => i.Value.id != item.id))
         {
-            int id = GetNextKeyID();
-            if (!_masterItemList.ContainsKey(id))
-            {
-                item.id = id;
-                _masterItemList.Add(id, item);
+                _masterItemList.Add(item.id, item);
                 return true;
-            }
         }
         return false;
     }
@@ -108,6 +106,12 @@ public class InventoryManager : MonoBehaviour
             WriteOutToJson();
         }
         return added;
+    }
+
+    public void UpdateItemInMasterList(Item item)
+    {
+        _masterItemList[item.id] = item;
+        WriteOutToJson();
     }
 
     [ContextMenu("Add Test Item")]
@@ -133,13 +137,13 @@ public class InventoryManager : MonoBehaviour
     [ContextMenu("Save Master List")]
     public void WriteOutToJson()
     {
-        Debug.Log(_masterItemList.Count);
+        //Debug.Log(_masterItemList.Count);
 
         var list = ItemDictionaryConverter.ToWrapper(_masterItemList);
 
         string masterList = JsonUtility.ToJson(list, true);
 
-        Debug.Log(masterList);
+        //Debug.Log(masterList);
 
         string filePath = Path.Combine(Application.persistentDataPath, "MasterItems.json");
         File.WriteAllText(filePath, masterList);
