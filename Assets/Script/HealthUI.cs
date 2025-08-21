@@ -26,7 +26,7 @@ public class HealthUI : MonoBehaviour
         CalculateHearts(_playerInformation.CurrentHealth);
     }
 
-    private void CalculateHearts(int health)
+    public void CalculateHearts(int health)
     {
         // Divide health into full hearts (2 HP) and remainder half-heart (1 HP)
         int fullHearts = health / 2;
@@ -60,14 +60,19 @@ public class HealthUI : MonoBehaviour
             _heartContainers[i].sprite = _heartSprites[2];
         }
 
-        // If there’s a half heart, place it after the full hearts
-        if (halfHearts > 0)
-            _heartContainers[fullHearts].sprite = _heartSprites[1];
+        if (fullHearts < _heartContainers.Count)
+        {
+            // If there’s a half heart, place it after the full hearts
+            if (halfHearts > 0)
+                _heartContainers[fullHearts].sprite = _heartSprites[1];
+            else
+                _heartContainers[fullHearts].sprite = _heartSprites[0];
+        }
 
         // Set all remaining hearts (after full + half) to empty
         for (int i = fullHearts + 1; i < transform.childCount; i++)
-        {
-            _heartContainers[i].sprite = _heartSprites[0];
-        }
+            {
+                _heartContainers[i].sprite = _heartSprites[0];
+            }
     }
 }

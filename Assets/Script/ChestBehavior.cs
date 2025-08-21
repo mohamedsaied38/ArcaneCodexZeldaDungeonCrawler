@@ -9,6 +9,7 @@ public class ChestBehavior : MonoBehaviour
     private InputSystem_Actions _input;
 
     [SerializeField] private int _contentAmount;
+    [SerializeField] private bool _healthFountain;
 
 
     private void Start()
@@ -31,7 +32,15 @@ public class ChestBehavior : MonoBehaviour
         if (!_isInteractable) return;
 
         _anim.SetBool("IsOpen", true);
-        //Open container Inventory window
+
+        if (_healthFountain)
+        {
+            FindFirstObjectByType<PlayerInformation>().HealDamage(_contentAmount);
+        }
+        else
+        {
+            //Open container Inventory window
+        }
     }
 
     [ContextMenu("Test Close Chest")]

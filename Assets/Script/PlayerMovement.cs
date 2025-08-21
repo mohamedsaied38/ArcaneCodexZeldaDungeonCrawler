@@ -144,7 +144,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void AdjustDirection(Vector3 direction)
     {
-        Debug.Log("AdjustDirection");
+        //Debug.Log("AdjustDirection");
         _direction = direction;
 
         _isKickedBack = true;

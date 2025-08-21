@@ -32,7 +32,7 @@ public class BaseEnemyAI : MonoBehaviour
         if (_player != null && _agent.remainingDistance <= _attackDistance && !_isAttacking)
         {
             StartCoroutine(AttackPlayer());
-            Debug.Log("Player Reached");
+            //Debug.Log("Player Reached");
             _playerInfo.CauseDamge(_attackDamage);
             DirectPlayer();
         }

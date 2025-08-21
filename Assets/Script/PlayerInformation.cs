@@ -35,7 +35,11 @@ public class PlayerInformation : MonoBehaviour
         if (_currentHealth < 0) 
             _currentHealth = 0;
 
+        UIManager.Instance.UpdateHealth(_currentHealth);
         _animator.SetTrigger("Damage");
+
+        if (_currentHealth == 0)
+            Destroy(this.gameObject); //Change Later
     }
 
     public void HealDamage(int healAmount)
@@ -43,6 +47,8 @@ public class PlayerInformation : MonoBehaviour
         _currentHealth += healAmount;
         if ( _currentHealth > _maxHealth)
             _currentHealth = _maxHealth;
+
+        UIManager.Instance.UpdateHealth( _currentHealth);
     }   
 
     /// <summary>

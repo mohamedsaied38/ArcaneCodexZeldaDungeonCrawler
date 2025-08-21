@@ -6,7 +6,7 @@ public class EnemyDetectionScript : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Player Detected");
+            //Debug.Log("Player Detected");
             transform.parent.GetComponent<BaseEnemyAI>().SetPlayerTarget(other.gameObject);
         }
 
