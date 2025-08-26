@@ -1,8 +1,6 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEditor;
-using UnityEditor.Rendering;
 using UnityEngine;
 
 public class ItemCreatorWindow : EditorWindow
@@ -19,15 +17,24 @@ public class ItemCreatorWindow : EditorWindow
 
     private Vector2 _scrollPos;
 
+    private static readonly Vector2 WindowMinSize = new Vector2(610, 250);
+    
     private string _message;
     Item _newItem;
+
+    private GUIStyle _editorErrorMessageStyle;
+    private bool _isSet;
 
     private void OnEnable()
     {
         // Look for the InventoryManager in the open scene
         _mgr = FindFirstObjectByType<InventoryManager>();
-        _mgr.ReadInJsonList();
-        _masterList = _mgr.MasterItemList;
+        RefreshList();
+    }
+
+    private void OnDisable()
+    {
+        _isSet = false;
     }
 
     // Adds menu option under "Tools/Inventory"
@@ -35,20 +42,26 @@ public class ItemCreatorWindow : EditorWindow
     public static void Open()
     {
         // Creates and shows the editor window
-        GetWindow<ItemCreatorWindow>("Create Item");
+        var window = GetWindow<ItemCreatorWindow>("Create Item");
+        window.minSize = WindowMinSize;
     }
 
     // Unity calls this every frame the window is visible to draw the UI
     private void OnGUI()
     {
-        GUIStyle editorErrorMessageStyle = new GUIStyle(GUI.skin.label)
+        if (!_isSet)
         {
-            richText = true,
-            alignment = TextAnchor.MiddleCenter,
-            wordWrap = true,
-            fontSize = 16
-        };
-       
+            _editorErrorMessageStyle = new GUIStyle(GUI.skin.label)
+            {
+                richText = true,
+                alignment = TextAnchor.MiddleCenter,
+                wordWrap = true,
+                fontSize = 16
+            };
+            _isSet = true;
+        }
+        
+        
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.BeginVertical(GUILayout.MinWidth(300));
       
@@ -75,8 +88,10 @@ public class ItemCreatorWindow : EditorWindow
         {
             // Create a new Item object.
             // ID will be assigned by the InventoryManager itself.
-            _newItem = new Item(_name, _type, _id);
-            _newItem.value = _value;
+            _newItem = new Item(_name, _type, _id)
+            {
+                value = _value
+            };
 
             Debug.Log($"{_newItem.name} {_newItem.id}");
 
@@ -85,6 +100,7 @@ public class ItemCreatorWindow : EditorWindow
             {
                 _message = $"<color=green>Added '{_name}' to master list and saved.</color>";
                 _isDup = false;
+                RefreshList();
             }
             else
             {
@@ -94,7 +110,7 @@ public class ItemCreatorWindow : EditorWindow
             Debug.Log(_message);
         }
 
-        EditorGUILayout.LabelField(_message, editorErrorMessageStyle);
+        EditorGUILayout.LabelField(_message, _editorErrorMessageStyle);
         if (_isDup)
         {
             EditorGUILayout.BeginHorizontal();
@@ -103,6 +119,7 @@ public class ItemCreatorWindow : EditorWindow
                 _mgr.UpdateItemInMasterList(_newItem);
                 _isDup = false;
                 _message = string.Empty;
+                RefreshList();
             }
             if (GUILayout.Button("Assign New ID"))
             {
@@ -110,18 +127,25 @@ public class ItemCreatorWindow : EditorWindow
                 _id = _newItem.id;
                 _isDup = false;
                 _message = string.Empty;
+                RefreshList();
             }
             EditorGUILayout.EndHorizontal();
         }
 
-        //GUILayout.Label(_message,richTextStyle);
         EditorGUILayout.EndVertical();
+        EditorGUILayout.BeginVertical(GUILayout.MinWidth(300));
 
-
-        EditorGUILayout.BeginVertical();
-
+        
+        
+        EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("Master Item List", EditorStyles.boldLabel);
-
+        
+        if (GUILayout.Button("Refresh List", GUILayout.MaxWidth(150)))
+        {
+            RefreshList();
+        }
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.Space(10);
         _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos,GUILayout.Height(150));
 
         foreach(var kvp in _masterList)
@@ -139,7 +163,12 @@ public class ItemCreatorWindow : EditorWindow
    
         EditorGUILayout.EndVertical();
         EditorGUILayout.EndHorizontal();
+    }
 
+    private void RefreshList()
+    {
+        _mgr.ReadInJsonList();
+        _masterList = _mgr.MasterItemList;
     }
 }
 #endif
