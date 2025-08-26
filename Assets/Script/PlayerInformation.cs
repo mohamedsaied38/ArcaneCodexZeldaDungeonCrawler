@@ -16,7 +16,6 @@ public class PlayerInformation : MonoBehaviour
     public float Speed => _speed;
     public int AttackDamage => _attackDamage;
 
-
     private void Start()
     {
         _animator = GetComponent<Animator>();
@@ -50,6 +49,17 @@ public class PlayerInformation : MonoBehaviour
 
         UIManager.Instance.UpdateHealth( _currentHealth);
     }   
+
+    public void IncreaseMaxHealth(int increaseAmount, bool fullRestore)
+    {
+        _maxHealth += increaseAmount;
+        if (fullRestore)
+            _currentHealth = _maxHealth;
+        else
+            _currentHealth += increaseAmount;
+
+        UIManager.Instance.UpdateHealth(_currentHealth);
+    }
 
     /// <summary>
     /// Equip(+) or unEquip(-) armor items

@@ -31,6 +31,11 @@ public class InventoryManager : MonoBehaviour
 
     public Dictionary<int, Item> MasterItemList => _masterItemList;
 
+    private void Awake()
+    {
+        ReadInJsonList();
+    }
+
     public void AddToInventory(int id, int count)
     {
         if (!_masterItemList.ContainsKey(id))
@@ -75,7 +80,7 @@ public class InventoryManager : MonoBehaviour
         if (!_masterItemList.ContainsKey(id))
         {
             Debug.LogWarning($"Item Id:{id} does not exist in Master Item List.");
-            return 0;
+            return -1;
         }
         if (!_playerInventory.ContainsKey(id) ) return 0;
         else return _playerInventory[id];

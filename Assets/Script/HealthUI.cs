@@ -71,8 +71,8 @@ public class HealthUI : MonoBehaviour
 
         // Set all remaining hearts (after full + half) to empty
         for (int i = fullHearts + 1; i < transform.childCount; i++)
-            {
-                _heartContainers[i].sprite = _heartSprites[0];
-            }
+        {
+            _heartContainers[i].sprite = _heartSprites[0];
+        }
     }
 }
