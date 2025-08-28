@@ -26,13 +26,15 @@ public class HeartPiece : MonoBehaviour, ICollidable
             Debug.Log("Collided with Player");
             if (_invManager != null)
             {
-                _invManager.AddToInventory(_heartPieceID,1);
+                _invManager.AddToInventory(_heartPieceID, 1);
                 if (_invManager.InventoryAmount(_heartPieceID) >= _numOfPiecesForFullHeart)
                     HeartMerge();
                 else
                     Debug.Log($"Heart Pieces Collected = {_invManager.InventoryAmount(_heartPieceID)}");
 
-                    Destroy(this.gameObject);
+                if (transform.parent != null)
+                    Destroy(transform.parent);
+                Destroy(this.gameObject);
             }
         }
     }

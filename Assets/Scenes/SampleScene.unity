@@ -1199,6 +1199,7 @@ GameObject:
   - component: {fileID: 1537667353}
   - component: {fileID: 1537667352}
   - component: {fileID: 1537667354}
+  - component: {fileID: 1537667355}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -1254,6 +1255,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ca4f20be8c77ee44a73b0f7554b6d40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1537667355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537667351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce2b60dc97b2b4d4aa4d955d37ea9ecd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _lootSpawnPrefabs:
+  - {fileID: 8458946812343805013, guid: d6001e85c87d4cf4fb8514bfcf98cb21, type: 3}
+  - {fileID: 8242933878776944695, guid: 78b0fc9d027a3c342bbe73115260e1f9, type: 3}
+  _lootDropRate: 0500000005000000
+  _lootDropChance: 0.75
 --- !u!1 &1574582200
 GameObject:
   m_ObjectHideFlags: 0

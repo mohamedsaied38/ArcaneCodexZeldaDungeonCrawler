@@ -360,7 +360,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 713d8f8c6b722854796b142bfcb81e75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _contentAmount: 5
+  _contentAmount: 1
+  _healthFountain: 0
+  _randomLoot: 1
 --- !u!65 &7724226315431762313
 BoxCollider:
   m_ObjectHideFlags: 0

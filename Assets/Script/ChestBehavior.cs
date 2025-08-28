@@ -10,6 +10,7 @@ public class ChestBehavior : MonoBehaviour
 
     [SerializeField] private int _contentAmount;
     [SerializeField] private bool _healthFountain;
+    [SerializeField] private bool _randomLoot;
 
 
     private void Start()
@@ -24,6 +25,7 @@ public class ChestBehavior : MonoBehaviour
         _input = new InputSystem_Actions();
         _input.Player.Enable();
         _input.Player.Interact.performed += OpenChest;
+        _anim.SetInteger("Contents", _contentAmount);
     }    
        
     [ContextMenu("Test Open Chest")]
@@ -36,6 +38,12 @@ public class ChestBehavior : MonoBehaviour
         if (_healthFountain)
         {
             FindFirstObjectByType<PlayerInformation>().HealDamage(_contentAmount);
+        }
+        else if (_randomLoot)
+        {
+            SpawnManager.Instance.DropLoot(transform.position);
+            _contentAmount = 0;
+            _anim.SetInteger("Contents", _contentAmount);
         }
         else
         {

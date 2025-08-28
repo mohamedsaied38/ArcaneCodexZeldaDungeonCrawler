@@ -18,7 +18,7 @@ public class MobInfo : MonoBehaviour
         {
             rc.RemoveRenderer(GetComponent<Renderer>());
         }
-
+        SpawnManager.Instance.DropLoot(transform.position);
         Destroy(this.gameObject);
     }
 
