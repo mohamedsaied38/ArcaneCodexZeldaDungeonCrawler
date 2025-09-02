@@ -148,8 +148,10 @@ public class ItemCreatorWindow : EditorWindow
         EditorGUILayout.Space(10);
         _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos,GUILayout.Height(150));
 
+        
         foreach(var kvp in _masterList)
         {
+            EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button(kvp.Value.name))
             {
                 _name = kvp.Value.name;
@@ -157,6 +159,14 @@ public class ItemCreatorWindow : EditorWindow
                 _value = kvp.Value.value;
                 _id = kvp.Value.id;
             }
+            if (GUILayout.Button("X", GUILayout.Width(20)))
+            {
+                _mgr.RemoveFromMasterList(kvp.Key);
+                RefreshList();
+                EditorGUILayout.EndHorizontal();
+                break;
+            }
+            EditorGUILayout.EndHorizontal();
         }
 
         EditorGUILayout.EndScrollView();

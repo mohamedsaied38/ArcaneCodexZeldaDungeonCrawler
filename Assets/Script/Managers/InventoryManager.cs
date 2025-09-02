@@ -75,6 +75,18 @@ public class InventoryManager : MonoBehaviour
 
     }
 
+    public void RemoveFromMasterList(int key)
+    {
+        if (!_masterItemList.ContainsKey(key))
+        {
+            Debug.LogWarning($"Item Id:{key} does not exist in Master Item List.");
+            return;
+        }
+
+        _masterItemList.Remove(key);
+        WriteOutToJson();
+    }
+
     public int InventoryAmount(int id)
     {
         if (!_masterItemList.ContainsKey(id))
