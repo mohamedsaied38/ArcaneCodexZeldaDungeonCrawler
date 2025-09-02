@@ -33,7 +33,7 @@ public class HeartPiece : MonoBehaviour, ICollidable
                     Debug.Log($"Heart Pieces Collected = {_invManager.InventoryAmount(_heartPieceID)}");
 
                 if (transform.parent != null)
-                    Destroy(transform.parent);
+                    Destroy(transform.parent.gameObject);
                 Destroy(this.gameObject);
             }
         }
