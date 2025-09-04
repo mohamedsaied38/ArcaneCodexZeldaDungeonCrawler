@@ -28,6 +28,7 @@ public class CoinBehaviour : MonoBehaviour, ICollidable
             {
                 _invManager.AddToInventory(_coinID, _coinAmount);
                 Debug.Log($"{_coinAmount} Coins Collected");
+                UIManager.Instance.UpdateCoins();
             }
 
             if (transform.parent != null)
