@@ -51,6 +51,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.Instance.IsMenuActive) return;
+
         if (_playerInformation.CurrentHealth <= 0 )
         {
             return;
@@ -87,7 +89,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void PlayerAttack(InputAction.CallbackContext context)
     {
-        if (_canAttack)
+        if (_canAttack && !GameManager.Instance.IsMenuActive)
         {
             _animator.SetTrigger("Attack");
             _canAttack = false;
